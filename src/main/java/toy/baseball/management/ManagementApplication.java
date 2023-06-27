@@ -2,12 +2,14 @@ package toy.baseball.management;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import toy.baseball.management.db.DBConnection;
 
-@SpringBootApplication
+import java.sql.Connection;
+
 public class ManagementApplication {
-
 	public static void main(String[] args) {
-		SpringApplication.run(ManagementApplication.class, args);
+		Connection connection = DBConnection.getInstance();
+
 	}
 
 }
