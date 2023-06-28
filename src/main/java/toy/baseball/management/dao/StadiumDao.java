@@ -37,7 +37,7 @@ public class StadiumDao {
                 Stadium stadium = new Stadium(
                         rs.getInt("id"),
                         rs.getString("name"),
-                        rs.getTimestamp("created_At")
+                        rs.getTimestamp("created_at")
                 );
 
                 // 5. collect

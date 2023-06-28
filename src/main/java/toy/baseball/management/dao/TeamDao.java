@@ -37,7 +37,7 @@ public class TeamDao {
                         rs.getInt("id"),
                         rs.getInt("stadium_id"),
                         rs.getString("name"),
-                        rs.getTimestamp("created_At")
+                        rs.getTimestamp("created_at")
                 );
 
                 // 5. collect
