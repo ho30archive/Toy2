@@ -35,8 +35,8 @@ public class StadiumDao {
             while (rs.next()) {
                 // 5. mapping(parsing) (db result -> model)
                 Stadium stadium = new Stadium(
-                        rs.getInt("stadium_id"),
-                        rs.getString("stadium_name"),
+                        rs.getInt("id"),
+                        rs.getString("name"),
                         rs.getTimestamp("created_At")
                 );
 
@@ -49,7 +49,7 @@ public class StadiumDao {
         }
     }
 
-    public void registerStadium(String stadiumName) {
+    public void registerStadium(String name) {
         LocalDateTime currentDateTime = LocalDateTime.now(); // Get the current date and time
 
 
@@ -60,11 +60,11 @@ public class StadiumDao {
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, 0);
-            statement.setString(2, stadiumName);
+            statement.setString(2, name);
             statement.setTimestamp(3, Timestamp.valueOf(currentDateTime));
 
             statement.executeUpdate();
-            System.out.println("등록 완료!");
+            System.out.println("스타디움 "+ name + " 등록 완료!");
         } catch (Exception e) {
             System.out.println("등록 실패!= " + e.getMessage());
         }
@@ -73,7 +73,7 @@ public class StadiumDao {
     // stadium one
 //    public Stadium findByName(String stadiumName) {
 //        // 1. sql
-//        String query = "select * from stadium_tb where stadium_name = ?";
+//        String query = "select * from stadium_tb where name = ?";
 //
 //        // 2. buffer
 //        try {
@@ -84,8 +84,8 @@ public class StadiumDao {
 //            ResultSet rs = statement.executeQuery();
 //            if (rs.next()) {
 //                Stadium stadium = new Stadium(
-//                        rs.getInt("stadium_id"),
-//                        rs.getString("stadium_name"),
+//                        rs.getInt("id"),
+//                        rs.getString("name"),
 //                        rs.getTimestamp("created_At")
 //                );
 //                return stadium;
