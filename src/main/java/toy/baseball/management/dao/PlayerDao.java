@@ -196,6 +196,31 @@ public class PlayerDao {
 
     }
 
+    public void updatePlayerPosition(int id, Enum<Positions> position) {
+        String updateQuery = "update player_tb set position = ? where id = ?";
+        String selectQuery = "select position from player_tb where id = ?";
+
+        try {
+            String beforePosition = null;
+            PreparedStatement updatePstmt = connection.prepareStatement(updateQuery);
+            PreparedStatement selectPstmt = connection.prepareStatement(selectQuery);
+
+            updatePstmt.setString(1, String.valueOf(position));
+            updatePstmt.setInt(2, id);
+            selectPstmt.setInt(1, id);
+
+            ResultSet rs = selectPstmt.executeQuery();
+            if (rs.next()) {
+                beforePosition = rs.getString("position");
+            }
+
+            updatePstmt.executeUpdate();
+            System.out.println(id + "번 선수 포지션 수정완료! " + beforePosition + " -> " + String.valueOf(position));
+        } catch (Exception e) {
+            System.out.println("수정 실패!= " + e.getMessage());
+        }
+    }
+
 
 
 }
