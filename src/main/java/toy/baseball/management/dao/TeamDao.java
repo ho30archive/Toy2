@@ -128,15 +128,15 @@ public class TeamDao {
     public void updateTeamStadiumId(int teamId, int stadiumId) {
         String updateQuery = "update team_tb set stadium_id = ? where id = ?";
         String selectQuery = "SELECT team_tb.stadium_id, stadium_tb.name FROM team_tb JOIN stadium_tb ON team_tb.stadium_id = stadium_tb.id where team_tb.id = ?";
-        String afterQuery = "SELECT stadium_tb.name FROM team_tb JOIN stadium_tb ON team_tb.stadium_id = stadium_tb.id where team_tb.id = ?";
 
         try {
             Integer beforeStadiumId = null;
             String beforeStadiumName = null;
+            Integer afterStadiumId = null;
             String afterStadiumName = null;
             PreparedStatement updatePstmt = connection.prepareStatement(updateQuery);
             PreparedStatement selectPstmt = connection.prepareStatement(selectQuery);
-            PreparedStatement afterPstmt = connection.prepareStatement(afterQuery);
+            PreparedStatement afterPstmt = connection.prepareStatement(selectQuery);
 
             updatePstmt.setInt(1, stadiumId);
             updatePstmt.setInt(2, teamId);
@@ -153,10 +153,11 @@ public class TeamDao {
 
             ResultSet rs2 = afterPstmt.executeQuery();
             if (rs2.next()) {
+                afterStadiumId = rs2.getInt("stadium_id");
                 afterStadiumName = rs2.getString("name");
             }
 
-            System.out.println("팀 스타디움 번호 수정완료! " + beforeStadiumId + "(" + beforeStadiumName + ") -> " + stadiumId +"(" + afterStadiumName + ")");
+            System.out.println("팀 스타디움 번호 수정완료! " + beforeStadiumId + "(" + beforeStadiumName + ") -> " + afterStadiumId +"(" + afterStadiumName + ")");
         } catch (Exception e) {
             System.out.println("수정 실패!= " + e.getMessage());
         }
