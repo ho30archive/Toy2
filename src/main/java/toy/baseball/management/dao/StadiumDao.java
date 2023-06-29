@@ -129,7 +129,7 @@ public class StadiumDao {
     }
 
     public void updateStadiumName(int id, String name) {
-        String updateQuery = "update from stadium_tb where id = ?";
+        String updateQuery = "update stadium_tb set name = ? where id = ?";
         String selectQuery = "select (name) from stadium_tb where id = ?";
 
         try {
@@ -137,7 +137,8 @@ public class StadiumDao {
             PreparedStatement updatePstmt = connection.prepareStatement(updateQuery);
             PreparedStatement selectPstmt = connection.prepareStatement(selectQuery);
 
-            updatePstmt.setInt(1, id);
+            updatePstmt.setString(1, name);
+            updatePstmt.setInt(2, id);
             selectPstmt.setInt(1, id);
 
             ResultSet rs = selectPstmt.executeQuery();
@@ -146,7 +147,7 @@ public class StadiumDao {
             }
 
             updatePstmt.executeUpdate();
-            System.out.println("스타디움 수정완료! " + beforeName + " -> " + name);
+            System.out.println("스타디움 이름 수정완료! " + beforeName + " -> " + name);
         } catch (Exception e) {
             System.out.println("수정 실패!= " + e.getMessage());
         }
