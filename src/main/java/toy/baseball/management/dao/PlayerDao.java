@@ -156,6 +156,46 @@ public class PlayerDao {
         }
     }
 
+    public void updatePlayerTeamId(int playerId, int teamId) {
+        String updateQuery = "update player_tb set team_id = ? where id = ?";
+        String selectQuery = "SELECT player_tb.team_id, team_tb.name FROM player_tb JOIN team_tb ON player_tb.team_id = team_tb.id where player_tb.id = ?";
+
+        try {
+            Integer beforeTeamId = null;
+            String beforeSTeamName = null;
+            Integer afterTeamId = null;
+            String afterTeamName = null;
+
+            PreparedStatement updatePstmt = connection.prepareStatement(updateQuery);
+            PreparedStatement selectPstmt = connection.prepareStatement(selectQuery);
+            PreparedStatement afterPstmt = connection.prepareStatement(selectQuery);
+
+            updatePstmt.setInt(1, teamId);
+            updatePstmt.setInt(2, playerId);
+            selectPstmt.setInt(1, playerId);
+            afterPstmt.setInt(1, playerId);
+
+            ResultSet rs = selectPstmt.executeQuery();
+            if (rs.next()) {
+                beforeTeamId = rs.getInt("team_id");
+                beforeSTeamName = rs.getString("name");
+            }
+
+            updatePstmt.executeUpdate();
+
+            ResultSet rs2 = afterPstmt.executeQuery();
+            if (rs2.next()) {
+                afterTeamId = rs2.getInt("team_id");
+                afterTeamName = rs2.getString("name");
+            }
+
+            System.out.println(playerId + "번 선수 팀 번호 수정완료! " + beforeTeamId + "(" + beforeSTeamName + ") -> " + afterTeamId +"(" + afterTeamName + ")");
+        } catch (Exception e) {
+            System.out.println("수정 실패!= " + e.getMessage());
+        }
+
+    }
+
 
 
 }
