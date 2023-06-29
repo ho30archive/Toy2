@@ -102,7 +102,7 @@ public class StadiumDao {
     public void deleteStadium(int id) {
 
         String deleteQuery = "delete from stadium_tb where id = ?";
-        String selectQuery = "select (name) from player_tb where id = ?";
+        String selectQuery = "select (name) from stadium_tb where id = ?";
 
 
         // 2. buffer
@@ -120,11 +120,37 @@ public class StadiumDao {
             }
 
             deletePstmt.executeUpdate();
-            System.out.println("플레이어 " + name + " 삭제 완료!");
+            System.out.println("스타디움 " + name + " 삭제 완료!");
 
         } catch (Exception e) {
             System.out.println("삭제 실패!= " + e.getMessage());
         }
+
+    }
+
+    public void updateStadium(int id, String name) {
+        String updateQuery = "delete from stadium_tb where id = ?";
+        String selectQuery = "select (name) from stadium_tb where id = ?";
+
+        try {
+            String beforeName = null;
+            PreparedStatement updatePstmt = connection.prepareStatement(updateQuery);
+            PreparedStatement selectPstmt = connection.prepareStatement(selectQuery);
+
+            updatePstmt.setInt(1, id);
+            selectPstmt.setInt(1, id);
+
+            ResultSet rs = selectPstmt.executeQuery();
+            if (rs.next()) {
+                beforeName = rs.getString("name");
+            }
+
+            updatePstmt.executeUpdate();
+            System.out.println("스타디움 수정완료! " + beforeName + " -> " + name);
+        } catch (Exception e) {
+            System.out.println("수정 실패!= " + e.getMessage());
+        }
+
 
     }
 
