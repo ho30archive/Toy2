@@ -73,5 +73,57 @@ public class TeamDao {
 
     }
 
+    public void deleteTeam(int id) {
+        String deleteQuery = "delete from team_tb where id = ?";
+        String selectQuery = "select (name) from team_tb where id = ?";
+
+        // 2. buffer
+        try {
+            String name = null;
+            PreparedStatement deletePstmt = connection.prepareStatement(deleteQuery);
+            PreparedStatement selectPstmt = connection.prepareStatement(selectQuery);
+
+            deletePstmt.setInt(1, id);
+            selectPstmt.setInt(1, id);
+
+            ResultSet rs = selectPstmt.executeQuery();
+            if (rs.next()) {
+                name = rs.getString("name");
+            }
+
+            deletePstmt.executeUpdate();
+            System.out.println("팀 " + name + " 삭제 완료!");
+
+        } catch (Exception e) {
+            System.out.println("삭제 실패!= " + e.getMessage());
+        }
+    }
+
+    public void updateTeamName(int id, String name) {
+        String updateQuery = "update team_tb set name = ? where id = ?";
+        String selectQuery = "select (name) from team_tb where id = ?";
+
+
+        try {
+            String beforeName = null;
+            PreparedStatement updatePstmt = connection.prepareStatement(updateQuery);
+            PreparedStatement selectPstmt = connection.prepareStatement(selectQuery);
+
+            updatePstmt.setString(1, name);
+            updatePstmt.setInt(2, id);
+            selectPstmt.setInt(1, id);
+
+            ResultSet rs = selectPstmt.executeQuery();
+            if (rs.next()) {
+                beforeName = rs.getString("name");
+            }
+
+            updatePstmt.executeUpdate();
+            System.out.println("팀 이름 수정완료! " + beforeName + " -> " + name);
+        } catch (Exception e) {
+            System.out.println("수정 실패!= " + e.getMessage());
+        }
+    }
+
 
 }
