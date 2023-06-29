@@ -92,7 +92,7 @@ public class TeamDao {
             }
 
             deletePstmt.executeUpdate();
-            System.out.println("팀 " + name + " 삭제 완료!");
+            System.out.println(id + "번 팀 " + name + " 삭제 완료!");
 
         } catch (Exception e) {
             System.out.println("삭제 실패!= " + e.getMessage());
@@ -119,7 +119,7 @@ public class TeamDao {
             }
 
             updatePstmt.executeUpdate();
-            System.out.println("팀 이름 수정완료! " + beforeName + " -> " + name);
+            System.out.println(id + "번 팀 이름 수정완료! " + beforeName + " -> " + name);
         } catch (Exception e) {
             System.out.println("수정 실패!= " + e.getMessage());
         }
