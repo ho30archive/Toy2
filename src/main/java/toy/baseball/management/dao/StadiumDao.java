@@ -128,8 +128,8 @@ public class StadiumDao {
 
     }
 
-    public void updateStadium(int id, String name) {
-        String updateQuery = "delete from stadium_tb where id = ?";
+    public void updateStadiumName(int id, String name) {
+        String updateQuery = "update from stadium_tb where id = ?";
         String selectQuery = "select (name) from stadium_tb where id = ?";
 
         try {
@@ -150,8 +150,6 @@ public class StadiumDao {
         } catch (Exception e) {
             System.out.println("수정 실패!= " + e.getMessage());
         }
-
-
     }
 
 }
