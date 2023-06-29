@@ -221,6 +221,11 @@ public class PlayerDao {
         }
     }
 
+    // TODO: 2023/06/29 퇴출쿼리짜야됨 
+    public void outPlayer() {
+        
+    }
+
 
 
 }
