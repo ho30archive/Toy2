@@ -147,7 +147,7 @@ public class StadiumDao {
             }
 
             updatePstmt.executeUpdate();
-            System.out.println("스타디움 이름 수정완료! " + beforeName + " -> " + name);
+            System.out.println(id + "번 스타디움 이름 수정완료! " + beforeName + " -> " + name);
         } catch (Exception e) {
             System.out.println("수정 실패!= " + e.getMessage());
         }
