@@ -157,7 +157,7 @@ public class TeamDao {
                 afterStadiumName = rs2.getString("name");
             }
 
-            System.out.println("팀 스타디움 번호 수정완료! " + beforeStadiumId + "(" + beforeStadiumName + ") -> " + afterStadiumId +"(" + afterStadiumName + ")");
+            System.out.println(teamId + "번 팀 스타디움 번호 수정완료! " + beforeStadiumId + "(" + beforeStadiumName + ") -> " + afterStadiumId +"(" + afterStadiumName + ")");
         } catch (Exception e) {
             System.out.println("수정 실패!= " + e.getMessage());
         }
