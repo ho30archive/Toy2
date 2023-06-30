@@ -1,7 +1,7 @@
 CREATE TABLE  stadium_tb(
                             id INT PRIMARY KEY AUTO_INCREMENT,
                             name VARCHAR(255) NOT NULL,
-                            created_At TIMESTAMP,
+                            created_at TIMESTAMP,
                             UNIQUE INDEX idx_name (name)
 );
 
@@ -10,7 +10,7 @@ CREATE TABLE team_tb (
                          id INT PRIMARY KEY AUTO_INCREMENT,
                          stadium_id INT NOT NULL,
                          name VARCHAR(255) NOT NULL,
-                         created_At TIMESTAMP,
+                         created_at TIMESTAMP,
                          FOREIGN KEY (stadium_id) REFERENCES stadium_tb (id),
                          UNIQUE INDEX idx_name (name)
 );
