@@ -1,5 +1,7 @@
 package toy.baseball.management.dao;
 
+import toy.baseball.management.dto.TeamRespDTO;
+import toy.baseball.management.exception.StadiumException;
 import toy.baseball.management.model.Stadium;
 import toy.baseball.management.model.Team;
 
@@ -11,9 +13,17 @@ import java.util.List;
 
 public class TeamDao {
     private Connection connection;
+    private static TeamDao instance;
 
     public TeamDao(Connection connection) {
         this.connection = connection;
+    }
+
+    public static TeamDao getInstance(Connection connection) {
+        if (instance == null) {
+            instance = new TeamDao(connection);
+        }
+        return instance;
     }
 
     public List<Team> findAllTeam() {
@@ -49,9 +59,47 @@ public class TeamDao {
         }
     }
 
+    public List<TeamRespDTO> findTeamStadium() {
+        // 0. collection
+        List<TeamRespDTO> teamStadiumList = new ArrayList<>();
+
+        // 1. sql
+        String query = "select t.id, t.name, t.created_at, s.id, s.name, s.created_at " +
+                "from team_tb t " +
+                "join stadium_tb s " +
+                "on s.id = t.stadium_id";
+
+        // 2. buffer
+        try{
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            // 3. send
+            ResultSet rs = statement.executeQuery();
+
+            // 4. cursor while
+            while (rs.next()) {
+                // 5. mapping(parsing) (db result -> model)
+                TeamRespDTO teamRespDTO = new TeamRespDTO(
+                        rs.getInt("t.id"),
+                        rs.getString("t.name"),
+                        rs.getTimestamp("t.created_at"),
+                        rs.getInt("s.id"),
+                        rs.getString("s.name"),
+                        rs.getTimestamp("s.created_at")
+                );
+
+                // 5. collect
+                teamStadiumList.add(teamRespDTO);
+            }
+            return teamStadiumList;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
-    public void registerTeam(int stadiumId, String name) {
+
+    public Team registerTeam(int stadiumId, String name) throws SQLIntegrityConstraintViolationException {
         LocalDateTime currentDateTime = LocalDateTime.now(); // Get the current date and time
 
         // 1. sql
@@ -66,14 +114,16 @@ public class TeamDao {
             statement.setTimestamp(4, Timestamp.valueOf(currentDateTime));
 
             statement.executeUpdate();
-            System.out.println("팀 "+ name + " 등록 완료!");
-        } catch (Exception e) {
-            System.out.println("등록 실패!= " + e.getMessage());
+            return findByName(name);
+//            System.out.println("팀 "+ name + " 등록 완료!");
+        } catch (SQLIntegrityConstraintViolationException e) {
+            throw new SQLIntegrityConstraintViolationException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-
     }
 
-    public void deleteTeam(int id) {
+    public Boolean deleteTeam(int id) {
         String deleteQuery = "delete from team_tb where id = ?";
         String selectQuery = "select (name) from team_tb where id = ?";
 
@@ -89,79 +139,118 @@ public class TeamDao {
             ResultSet rs = selectPstmt.executeQuery();
             if (rs.next()) {
                 name = rs.getString("name");
-            }
+            } else throw new NullPointerException();
 
-            deletePstmt.executeUpdate();
-            System.out.println(id + "번 팀 " + name + " 삭제 완료!");
-
-        } catch (Exception e) {
-            System.out.println("삭제 실패!= " + e.getMessage());
+            int i = deletePstmt.executeUpdate();
+            if (i == 1) {
+                return true;
+            } else return false;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            throw new StadiumException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public void updateTeamName(int id, String name) {
+    public Team updateTeamName(int id, String name) {
         String updateQuery = "update team_tb set name = ? where id = ?";
-        String selectQuery = "select (name) from team_tb where id = ?";
-
 
         try {
-            String beforeName = null;
             PreparedStatement updatePstmt = connection.prepareStatement(updateQuery);
-            PreparedStatement selectPstmt = connection.prepareStatement(selectQuery);
 
             updatePstmt.setString(1, name);
             updatePstmt.setInt(2, id);
-            selectPstmt.setInt(1, id);
 
-            ResultSet rs = selectPstmt.executeQuery();
-            if (rs.next()) {
-                beforeName = rs.getString("name");
+            int i = updatePstmt.executeUpdate();
+            if (i == 1) {
+                return findById(id);
             }
-
-            updatePstmt.executeUpdate();
-            System.out.println(id + "번 팀 이름 수정완료! " + beforeName + " -> " + name);
-        } catch (Exception e) {
-            System.out.println("수정 실패!= " + e.getMessage());
+            else return null;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            throw new StadiumException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public void updateTeamStadiumId(int teamId, int stadiumId) {
+    public Team updateTeamStadiumId(int teamId, int stadiumId) {
         String updateQuery = "update team_tb set stadium_id = ? where id = ?";
-        String selectQuery = "SELECT team_tb.stadium_id, stadium_tb.name FROM team_tb JOIN stadium_tb ON team_tb.stadium_id = stadium_tb.id where team_tb.id = ?";
 
         try {
-            Integer beforeStadiumId = null;
-            String beforeStadiumName = null;
-            Integer afterStadiumId = null;
-            String afterStadiumName = null;
             PreparedStatement updatePstmt = connection.prepareStatement(updateQuery);
-            PreparedStatement selectPstmt = connection.prepareStatement(selectQuery);
-            PreparedStatement afterPstmt = connection.prepareStatement(selectQuery);
 
             updatePstmt.setInt(1, stadiumId);
             updatePstmt.setInt(2, teamId);
-            selectPstmt.setInt(1, teamId);
-            afterPstmt.setInt(1, teamId);
 
-            ResultSet rs = selectPstmt.executeQuery();
-            if (rs.next()) {
-                beforeStadiumId = rs.getInt("stadium_id");
-                beforeStadiumName = rs.getString("name");
+            int i = updatePstmt.executeUpdate();
+            if (i == 1) {
+                return findById(teamId);
             }
-
-            updatePstmt.executeUpdate();
-
-            ResultSet rs2 = afterPstmt.executeQuery();
-            if (rs2.next()) {
-                afterStadiumId = rs2.getInt("stadium_id");
-                afterStadiumName = rs2.getString("name");
-            }
-
-            System.out.println(teamId + "번 팀 스타디움 번호 수정완료! " + beforeStadiumId + "(" + beforeStadiumName + ") -> " + afterStadiumId +"(" + afterStadiumName + ")");
-        } catch (Exception e) {
-            System.out.println("수정 실패!= " + e.getMessage());
+            else return null;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            throw new StadiumException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
+    }
+
+    public Team findByName(String teamName) {
+        // 1. sql
+        String query = "select * from team_tb where name = ?";
+
+        // 2. buffer
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, teamName);
+
+            // 3. send
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                Team team = new Team(
+                        rs.getInt("id"),
+                        rs.getInt("stadium_id"),
+                        rs.getString("name"),
+                        rs.getTimestamp("created_at")
+                );
+                return team;
+            }
+
+            // 4. mapping(parsing) (db result -> model)
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public Team findById(int teamId) {
+        // 1. sql
+        String query = "select * from team_tb where id = ?";
+
+        // 2. buffer
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, teamId);
+
+            // 3. send
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                Team team = new Team(
+                        rs.getInt("id"),
+                        rs.getInt("stadium_id"),
+                        rs.getString("name"),
+                        rs.getTimestamp("created_at")
+                );
+                return team;
+            }
+
+            // 4. mapping(parsing) (db result -> model)
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 
 

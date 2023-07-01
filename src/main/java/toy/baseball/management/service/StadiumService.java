@@ -28,16 +28,21 @@ public class StadiumService {
 
 
     public void getStadiumList(){
-        List<Stadium> stadiumList = stadiumDao.findAllStadium();
-        if (stadiumList.size() != 0) {
-            System.out.println("스타디움 조회 완료!");
-            System.out.println("| ---- id ------------------------ name ---------------------- createdAt --------------- |");
-            for (Stadium stadium : stadiumList) {
-                customPrint.printStadium(stadium);
+        try {
+            List<Stadium> stadiumList = stadiumDao.findAllStadium();
+            if (stadiumList.size() != 0) {
+                System.out.println("야구장 조회 완료!");
+                System.out.println("| ---- id ------------------------ name ---------------------- createdAt --------------- |");
+                for (Stadium stadium : stadiumList) {
+                    customPrint.printStadium(stadium);
+                }
+            } else {
+                System.out.println("등록된 야구장이 없습니다.");
             }
-        } else {
-            System.out.println("등록된 스타디움이 없습니다.");
+        } catch (RuntimeException e) {
+            System.out.println("DB연결을 확인해주세요." + e.getMessage());
         }
+
     }
 
     public void registerStadium(String name) {
@@ -46,22 +51,33 @@ public class StadiumService {
             if (stadium == null) {
                 throw new NullPointerException();
             }
-            System.out.println("스타디움 " + name + " 등록 완료!");
+            System.out.println("야구장 " + name + " 등록 완료!");
             System.out.println("| ---- id ------------------------ name ---------------------- createdAt --------------- |");
             customPrint.printStadium(stadium);
         } catch (NullPointerException e) {
             System.out.println("등록 실패! = " + e.getMessage());
         } catch (SQLIntegrityConstraintViolationException e) {
             System.out.println("등록 실패! " + name + "이(가) 이미 존재합니다.");
+        } catch (RuntimeException e) {
+            System.out.println("DB연결을 확인해주세요." + e.getMessage());
         }
     }
 
     public void deleteStadiumById(int staiumId) {
         try {
-            stadiumDao.deleteById(staiumId);
+            Boolean check = stadiumDao.deleteById(staiumId);
+            if (check) {
+                System.out.println(staiumId + "번 야구장 삭제 성공");
+            } else {
+                System.out.println("삭제 실패");
+            }
         } catch (NullPointerException e) {
-            System.out.println("삭제 실패 " + staiumId + "번 아이디의 스타디움은 존재 하지 않습니다.");
-            System.out.println("스타디움 아이디를 확인해 주세요.");
+            System.out.println("삭제 실패! " + staiumId + "번 아이디의 야구장은 존재 하지 않습니다.");
+            System.out.println("야구장 아이디를 확인해 주세요.");
+        } catch (StadiumException e) {
+            System.out.println("삭제 실패! 무결성 제약조건에 위배됩니다. 관련 데이터를 먼저 삭제해 주세요.");
+        } catch (RuntimeException e) {
+            System.out.println("DB연결을 확인해주세요." + e.getMessage());
         }
     }
 
@@ -69,13 +85,14 @@ public class StadiumService {
         try {
             Stadium stadium = stadiumDao.updateStadiumName(stadiumId, name);
             if (stadium == null) {
-                throw new NullPointerException();
+                throw new RuntimeException();
+            } else {
+                System.out.println(name + "으로 이름 수정 완료!");
+                System.out.println("| ---- id ------------------------ name ---------------------- createdAt --------------- |");
+                customPrint.printStadium(stadium);
             }
-            System.out.println(name + "으로 이름 수정 완료!");
-            System.out.println("| ---- id ------------------------ name ---------------------- createdAt --------------- |");
-            customPrint.printStadium(stadium);
         } catch (StadiumException e) {
-            System.out.println("수정 실패! 중복되는 스타미움 이름 입니다.");
+            System.out.println("수정 실패! 중복되는 야구 이름 입니다.");
         } catch (RuntimeException e) {
             System.out.println("수정 실패! 아이디를 확인해주세요.");
         }

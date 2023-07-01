@@ -140,7 +140,7 @@ public class StadiumDao {
     }
 
 
-    public void deleteById(int id) {
+    public Boolean deleteById(int id) {
 
         String deleteQuery = "delete from stadium_tb where id = ?";
         String selectQuery = "select (name) from stadium_tb where id = ?";
@@ -160,14 +160,17 @@ public class StadiumDao {
                 name = rs.getString("name");
             } else throw new NullPointerException();
 
-            deletePstmt.executeUpdate();
-            System.out.println("스타디움 " + name + " 삭제 완료!");
+            int i = deletePstmt.executeUpdate();
+            if (i == 1) {
+                return true;
+            }
+            else return false;
 
-        } catch (Exception e) {
-            throw new NullPointerException();
-//            System.out.println("삭제 실패!= " + e.getMessage());
+        } catch (SQLIntegrityConstraintViolationException e) {
+            throw new StadiumException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-
     }
 
     public Stadium updateStadiumName(int id, String name) {
@@ -179,9 +182,11 @@ public class StadiumDao {
             updatePstmt.setString(1, name);
             updatePstmt.setInt(2, id);
 
-            updatePstmt.executeUpdate();
-//            System.out.println(id + "번 스타디움 이름 수정완료! " + beforeName + " -> " + name);
-            return findById(id);
+            int i = updatePstmt.executeUpdate();
+            if (i == 1) {
+                return findById(id);
+            }
+            else return null;
         } catch (SQLIntegrityConstraintViolationException e) {
             throw new StadiumException();
         } catch (SQLException e) {

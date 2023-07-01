@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("unchecked")
+
 public class PlayerDao {
 
     private Connection connection;
@@ -101,8 +101,6 @@ public class PlayerDao {
         return null;
     }
 
-
-    // TODO: 2023/06/29  deletePlayer이거 생각해보니까 퇴출목록?에 보내야함 아오!!
         public void deletePlayer(int id) {
 
         String deleteQuery = "delete from player_tb where id = ?";
@@ -158,7 +156,10 @@ public class PlayerDao {
 
     public void updatePlayerTeamId(int playerId, int teamId) {
         String updateQuery = "update player_tb set team_id = ? where id = ?";
-        String selectQuery = "SELECT player_tb.team_id, team_tb.name FROM player_tb JOIN team_tb ON player_tb.team_id = team_tb.id where player_tb.id = ?";
+        String selectQuery = "SELECT player_tb.team_id, team_tb.name " +
+                "FROM player_tb " +
+                "JOIN team_tb ON player_tb.team_id = team_tb.id " +
+                "where player_tb.id = ?";
 
         try {
             Integer beforeTeamId = null;
