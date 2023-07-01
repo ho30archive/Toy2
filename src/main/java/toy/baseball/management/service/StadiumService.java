@@ -20,7 +20,7 @@ public class StadiumService {
     static final StadiumDao stadiumDao = StadiumDao.getInstance(connection);
     private static final StadiumService instance = new StadiumService();
 
-    CustomPrint customPrint = new CustomPrint();
+    private static final CustomPrint customPrint = CustomPrint.getInstance();
 
     private StadiumService() {
     }

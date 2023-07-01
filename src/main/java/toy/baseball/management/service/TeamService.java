@@ -17,8 +17,8 @@ public class TeamService {
     static final Connection connection = DBConnection.getInstance();
     static final TeamDao teamDao = TeamDao.getInstance(connection);
     private static final TeamService instance = new TeamService();
+    private static final CustomPrint customPrint = CustomPrint.getInstance();
 
-    CustomPrint customPrint = new CustomPrint();
 
     private TeamService() {
     }

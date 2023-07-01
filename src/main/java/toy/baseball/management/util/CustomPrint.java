@@ -6,6 +6,15 @@ import toy.baseball.management.model.Team;
 
 public class CustomPrint {
 
+    private static CustomPrint instance;
+
+    public static CustomPrint getInstance() {
+        if (instance == null) {
+            instance = new CustomPrint();
+        }
+        return instance;
+    }
+
     public void printTeam(Team team) {
         String id = String.valueOf(team.getId());
         String stadiumId = String.valueOf(team.getStadiumId());
