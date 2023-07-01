@@ -2,6 +2,7 @@ package toy.baseball.management.service;
 
 import toy.baseball.management.dao.PlayerDao;
 import toy.baseball.management.db.DBConnection;
+import toy.baseball.management.enums.Positions;
 import toy.baseball.management.exception.StadiumException;
 import toy.baseball.management.model.Player;
 import toy.baseball.management.model.Stadium;
@@ -45,13 +46,27 @@ public class PlayerService {
 
     public void registerPlayer(int teamId, String name, String position) {
         try {
-            Player player = playerDao.registerPlayer(teamId, name, position);
-            if (player == null) {
-                throw new NullPointerException();
+            Boolean isContained = false;
+            Positions[] enums = Positions.values();
+            for (Positions p : enums) {
+                if (p.name().equals(position)) {
+                    isContained = true;
+                    break;
+                }
             }
-            System.out.println("선수 " + name + "등록완료!");
-            System.out.println("| ---- id ------------------------ teamId -------------------- name ---------------------- position ------------------ createdAt --------------- |");
-            customPrint.printPlayer(player);
+            if (isContained) {
+                Player player = playerDao.registerPlayer(teamId, name, position);
+                if (player == null) {
+                    throw new NullPointerException();
+                }
+                System.out.println("선수 " + name + " 등록완료!");
+                System.out.println("| ---- id ------------------------ teamId -------------------- name ---------------------- position ------------------ createdAt --------------- |");
+                customPrint.printPlayer(player);
+            } else throw new IllegalStateException();
+
+
+        } catch (IllegalStateException e) {
+            System.out.println("올바른 포지션을 입력해주세요.");
         } catch (NullPointerException e) {
             System.out.println("선수 등록 실패!");
         } catch (StadiumException e) {
