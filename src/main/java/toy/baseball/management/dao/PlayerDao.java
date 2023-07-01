@@ -145,7 +145,7 @@ public class PlayerDao {
         }
     }
 
-        public void deletePlayer(int id) {
+        public Boolean deletePlayer(int id) {
 
         String deleteQuery = "delete from player_tb where id = ?";
         String selectQuery = "select (name) from player_tb where id = ?";
@@ -160,17 +160,19 @@ public class PlayerDao {
             selectPstmt.setInt(1, id);
 
             ResultSet rs = selectPstmt.executeQuery();
-            if (rs.next()) {
-                name = rs.getString("name");
+            if (!rs.next()) {
+                throw new NullPointerException();
+            } else {
+                int i = deletePstmt.executeUpdate();
+                if (i == 1) {
+                    return true;
+                } else return false;
             }
-
-            deletePstmt.executeUpdate();
-            System.out.println("플레이어 " + name + " 삭제 완료!");
-
-        } catch (Exception e) {
-            System.out.println("삭제 실패!= " + e.getMessage());
+        } catch (SQLIntegrityConstraintViolationException e) {
+            throw new StadiumException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-
     }
 
     public void updatePlayerName(int id, String name) {

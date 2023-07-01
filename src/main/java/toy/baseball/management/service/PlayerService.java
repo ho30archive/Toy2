@@ -31,13 +31,13 @@ public class PlayerService {
         try {
             List<Player> playerList = playerDao.findAllPlayer();
             if (playerList.size() != 0) {
-                System.out.println("플레이어 조회 완료!");
+                System.out.println("선수 리스트 조회 완료!");
                 System.out.println("| ---- id ------------------------ teamId -------------------- name ---------------------- position ------------------ createdAt --------------- |");
                 for (Player player : playerList) {
                     customPrint.printPlayer(player);
                 }
             } else {
-                System.out.println("등록된 팀이 없습니다.");
+                System.out.println("등록된 선수가 없습니다.");
             }
         } catch (RuntimeException e) {
             System.out.println("DB연결을 확인해주세요." + e.getMessage());
@@ -48,13 +48,13 @@ public class PlayerService {
         try {
             List<Player> playerList = playerDao.findByTeamId(teamId);
             if (playerList.size() != 0) {
-                System.out.println(teamId + "번 팀 플레이어 조회 완료!");
+                System.out.println(teamId + "번 팀 선수 리스트 조회 완료!");
                 System.out.println("| ---- id ------------------------ name ---------------------- position ------------------ createdAt --------------- |");
                 for (Player player : playerList) {
                     customPrint.printPlayerByTeamId(player);
                 }
             } else {
-                System.out.println("등록된 팀이 없습니다.");
+                System.out.println("등록된 선수가 없습니다.");
             }
         } catch (RuntimeException e) {
             System.out.println("DB연결을 확인해주세요." + e.getMessage());
@@ -93,4 +93,24 @@ public class PlayerService {
         }
 
     }
+
+    public void deletedPlayerById(int playerId) {
+        try {
+            Boolean check = playerDao.deletePlayer(playerId);
+            if (check) {
+                System.out.println(playerId + "번 선수 삭제 성공");
+            } else {
+                System.out.println("삭제 실패");
+            }
+        } catch (NullPointerException e) {
+            System.out.println("선수 삭제 실패! " + playerId + "번의 선수는 존재 하지 않습니다.");
+            System.out.println("선수 아이디를 확인해 주세요.");
+        } catch (StadiumException e) {
+            System.out.println("선수 삭제 실패! 무결성 제약조건에 위배됩니다. 관련 데이터를 먼저 삭제해 주세요.");
+        } catch (RuntimeException e) {
+            System.out.println("DB연결을 확인해주세요." + e.getMessage());
+        }
+    }
+
+
 }
