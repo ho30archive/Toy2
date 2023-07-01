@@ -117,10 +117,10 @@ public class PlayerDao {
         return null;
     }
 
-    // TODO: 2023/07/02 로직이 틀림
-    public Player findByTeamId(int teamId) {
+    public List<Player> findByTeamId(int teamId) {
+        List<Player> playerList = new ArrayList<>();
         // 1. sql
-        String query = "select * from player_tb where teamId = ?";
+        String query = "select * from player_tb where team_id = ?";
 
         // 2. buffer
         try {
@@ -129,7 +129,7 @@ public class PlayerDao {
 
             // 3. send
             ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
+            while (rs.next()) {
                 Player player = new Player(
                         rs.getInt("id"),
                         rs.getInt("team_id"),
@@ -137,12 +137,12 @@ public class PlayerDao {
                         rs.getString("position"),
                         rs.getTimestamp("created_at")
                 );
-                return player;
+                playerList.add(player);
             }
+            return playerList;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return null;
     }
 
         public void deletePlayer(int id) {

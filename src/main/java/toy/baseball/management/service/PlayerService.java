@@ -44,6 +44,23 @@ public class PlayerService {
         }
     }
 
+    public void getPlayerListByTeamId(int teamId) {
+        try {
+            List<Player> playerList = playerDao.findByTeamId(teamId);
+            if (playerList.size() != 0) {
+                System.out.println(teamId + "번 팀 플레이어 조회 완료!");
+                System.out.println("| ---- id ------------------------ name ---------------------- position ------------------ createdAt --------------- |");
+                for (Player player : playerList) {
+                    customPrint.printPlayerByTeamId(player);
+                }
+            } else {
+                System.out.println("등록된 팀이 없습니다.");
+            }
+        } catch (RuntimeException e) {
+            System.out.println("DB연결을 확인해주세요." + e.getMessage());
+        }
+    }
+
     public void registerPlayer(int teamId, String name, String position) {
         try {
             Boolean isContained = false;
