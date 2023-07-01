@@ -49,7 +49,7 @@ public class PlayerService {
             Boolean isContained = false;
             Positions[] enums = Positions.values();
             for (Positions p : enums) {
-                if (p.name().equals(position)) {
+                if (p.getPositionName().equals(position)) {
                     isContained = true;
                     break;
                 }
