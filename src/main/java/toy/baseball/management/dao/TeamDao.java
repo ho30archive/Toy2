@@ -99,7 +99,7 @@ public class TeamDao {
 
 
 
-    public Team registerTeam(int stadiumId, String name) throws SQLIntegrityConstraintViolationException {
+    public Team registerTeam(int stadiumId, String name) {
         LocalDateTime currentDateTime = LocalDateTime.now(); // Get the current date and time
 
         // 1. sql
@@ -117,7 +117,7 @@ public class TeamDao {
             return findByName(name);
 //            System.out.println("팀 "+ name + " 등록 완료!");
         } catch (SQLIntegrityConstraintViolationException e) {
-            throw new SQLIntegrityConstraintViolationException();
+            throw new StadiumException();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

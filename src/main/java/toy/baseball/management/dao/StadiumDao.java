@@ -59,7 +59,7 @@ public class StadiumDao {
         }
     }
 
-    public Stadium registerStadium(String name) throws SQLIntegrityConstraintViolationException {
+    public Stadium registerStadium(String name) {
         LocalDateTime currentDateTime = LocalDateTime.now(); // Get the current date and time
         // 1. sql
         String query = "insert into stadium_tb values (?, ?, ?)";
@@ -74,7 +74,7 @@ public class StadiumDao {
             int count = statement.executeUpdate();
             if (count > 0) return findByName(name);
         } catch (SQLIntegrityConstraintViolationException e) {
-            throw new SQLIntegrityConstraintViolationException();
+            throw new StadiumException();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -56,7 +56,7 @@ public class StadiumService {
             customPrint.printStadium(stadium);
         } catch (NullPointerException e) {
             System.out.println("등록 실패! = " + e.getMessage());
-        } catch (SQLIntegrityConstraintViolationException e) {
+        } catch (StadiumException e) {
             System.out.println("등록 실패! " + name + "이(가) 이미 존재합니다.");
         } catch (RuntimeException e) {
             System.out.println("DB연결을 확인해주세요." + e.getMessage());
