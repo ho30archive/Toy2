@@ -23,7 +23,7 @@ CREATE TABLE player_tb (
                            name VARCHAR(255),
                            position VARCHAR(255),
                            created_at TIMESTAMP,
-                           UNIQUE INDEX idx_team_position (team_id, position),
+                           UNIQUE INDEX idx_position (position),
                            FOREIGN KEY (team_id) REFERENCES team_tb(id)
 );
 
