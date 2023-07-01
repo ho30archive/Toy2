@@ -1,6 +1,8 @@
 package toy.baseball.management.dao;
 
+import org.springframework.boot.jta.atomikos.AtomikosDataSourceBean;
 import toy.baseball.management.enums.Positions;
+import toy.baseball.management.exception.StadiumException;
 import toy.baseball.management.model.Player;
 import toy.baseball.management.model.Stadium;
 
@@ -14,8 +16,17 @@ public class PlayerDao {
 
     private Connection connection;
 
+    private static PlayerDao instance;
+
     public PlayerDao(Connection connection) {
         this.connection = connection;
+    }
+
+    public static PlayerDao getInstance(Connection connection) {
+        if (instance == null) {
+            instance = new PlayerDao(connection);
+        }
+        return instance;
     }
 
     public List<Player> findAllPlayer() {
@@ -51,7 +62,7 @@ public class PlayerDao {
         }
     }
 
-    public void registerPlayer(int teamId, String name, Enum<Positions> position) {
+    public Player registerPlayer(int teamId, String name, String position) {
         LocalDateTime currentDateTime = LocalDateTime.now(); // Get the current date and time
 
         // 1. sql
@@ -63,17 +74,50 @@ public class PlayerDao {
             statement.setInt(1, 0);
             statement.setInt(2, teamId);
             statement.setString(3, name);
-            statement.setString(4, String.valueOf(position));
+            statement.setString(4, position);
             statement.setTimestamp(5, Timestamp.valueOf(currentDateTime));
 
-            statement.executeUpdate();
-            System.out.println("플레이어 "+ name + " 등록 완료!");
-        } catch (Exception e) {
-            System.out.println("등록 실패!= " + e.getMessage());
+            int i = statement.executeUpdate();
+            if (i == 1) {
+                return findByTeamIdPosition(teamId, position);
+            }
+            else return null;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            throw new StadiumException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    // 팀별선수 목록 조회
+    public Player findByTeamIdPosition(int teamId, String position) {
+        // 1. sql
+        String query = "select * from player_tb where team_id = ? and position = ?";
+
+        // 2. buffer
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, teamId);
+            statement.setString(2, position);
+
+            // 3. send
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                Player player = new Player(
+                        rs.getInt("id"),
+                        rs.getInt("team_id"),
+                        rs.getString("name"),
+                        rs.getString("position"),
+                        rs.getTimestamp("created_at")
+                );
+                return player;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    // TODO: 2023/07/02 로직이 틀림
     public Player findByTeamId(int teamId) {
         // 1. sql
         String query = "select * from player_tb where teamId = ?";
