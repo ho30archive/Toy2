@@ -1,7 +1,7 @@
 CREATE TABLE  stadium_tb(
                             id INT PRIMARY KEY AUTO_INCREMENT,
                             name VARCHAR(255) NOT NULL,
-                            created_At TIMESTAMP,
+                            created_at TIMESTAMP,
                             UNIQUE INDEX idx_name (name)
 );
 
@@ -10,7 +10,7 @@ CREATE TABLE team_tb (
                          id INT PRIMARY KEY AUTO_INCREMENT,
                          stadium_id INT NOT NULL,
                          name VARCHAR(255) NOT NULL,
-                         created_At TIMESTAMP,
+                         created_at TIMESTAMP,
                          FOREIGN KEY (stadium_id) REFERENCES stadium_tb (id),
                          UNIQUE INDEX idx_name (name)
 );
@@ -23,7 +23,7 @@ CREATE TABLE player_tb (
                            name VARCHAR(255),
                            position VARCHAR(255),
                            created_at TIMESTAMP,
-                           UNIQUE INDEX idx_team_position (team_id, position),
+                           UNIQUE INDEX idx_position (position),
                            FOREIGN KEY (team_id) REFERENCES team_tb(id)
 );
 
