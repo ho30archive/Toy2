@@ -137,14 +137,14 @@ public class TeamDao {
             selectPstmt.setInt(1, id);
 
             ResultSet rs = selectPstmt.executeQuery();
-            if (rs.next()) {
-                name = rs.getString("name");
-            } else throw new NullPointerException();
-
-            int i = deletePstmt.executeUpdate();
-            if (i == 1) {
-                return true;
-            } else return false;
+            if (!rs.next()) {
+                throw new NullPointerException();
+            } else {
+                int i = deletePstmt.executeUpdate();
+                if (i == 1) {
+                    return true;
+                } else return false;
+            }
         } catch (SQLIntegrityConstraintViolationException e) {
             throw new StadiumException();
         } catch (SQLException e) {

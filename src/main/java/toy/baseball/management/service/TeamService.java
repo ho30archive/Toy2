@@ -73,9 +73,9 @@ public class TeamService {
             System.out.println("| ---- id ------------------------ stadiumId ----------------- name ---------------------- createdAt --------------- |");
             customPrint.printTeam(team);
         } catch (NullPointerException e) {
-            System.out.println("등록 실패! = " + e.getMessage());
+            System.out.println("팀 등록 실패!");
         } catch (StadiumException e) {
-            System.out.println("등록 실패! " + name + "이(가) 이미 존재합니다.");
+            System.out.println("팀 등록 실패! " + name + "이(가) 이미 존재합니다.");
         } catch (RuntimeException e) {
             System.out.println("DB연결을 확인해주세요." + e.getMessage());
         }
@@ -91,10 +91,10 @@ public class TeamService {
                 System.out.println("삭제 실패");
             }
         } catch (NullPointerException e) {
-            System.out.println("삭제 실패! " + teamId + "번 아이디의 팀은 존재 하지 않습니다.");
+            System.out.println("팀 삭제 실패! " + teamId + "번 아이디의 팀은 존재 하지 않습니다.");
             System.out.println("팀 아이디를 확인해 주세요.");
         } catch (StadiumException e) {
-            System.out.println("삭제 실패! 무결성 제약조건에 위배됩니다. 관련 데이터를 먼저 삭제해 주세요.");
+            System.out.println("팀 삭제 실패! 무결성 제약조건에 위배됩니다. 관련 데이터를 먼저 삭제해 주세요.");
         } catch (RuntimeException e) {
             System.out.println("DB연결을 확인해주세요." + e.getMessage());
         }
@@ -111,9 +111,9 @@ public class TeamService {
                 customPrint.printTeam(team);
             }
         } catch (StadiumException e) {
-            System.out.println("수정 실패! 중복되는 팀 이름 입니다.");
+            System.out.println("팀 수정 실패! 중복되는 팀 이름 입니다.");
         } catch (RuntimeException e) {
-            System.out.println("수정 실패! 아이디를 확인해주세요.");
+            System.out.println("팀 수정 실패! 아이디를 확인해주세요.");
         }
     }
 
@@ -128,9 +128,9 @@ public class TeamService {
                 customPrint.printTeam(team);
             }
         } catch (StadiumException e) {
-            System.out.println("수정 실패! 존재하지 않는 야구장 번호 입니다.");
+            System.out.println("팀 수정 실패! 존재하지 않는 야구장 번호 입니다.");
         } catch (RuntimeException e) {
-            System.out.println("수정 실패! 아이디를 확인해주세요.");
+            System.out.println("팀 수정 실패! 아이디를 확인해주세요.");
         }
     }
 }
