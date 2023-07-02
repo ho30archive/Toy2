@@ -28,11 +28,13 @@ public class OutPlayerDao {
         return instance;
     }
 
-    public List<OutPlayer> findAllOutPlayer() {
+    public List<OutPlayerRespDTO> findAllOutPlayer() {
         // 0. collection
-        List<OutPlayer> OutPlayerList = new ArrayList<>();
+        List<OutPlayerRespDTO> outPlayerList = new ArrayList<>();
         // 1. sql
-        String query = "select * from out_player_tb";
+        String query = "select p.id, p.name, p.position, o.reason, o.created_at " +
+                "from out_player_tb o " +
+                "join player_tb p on o.player_id = p.id";
 
         try{
             PreparedStatement statement = connection.prepareStatement(query);
@@ -43,17 +45,18 @@ public class OutPlayerDao {
             // 4. cursor while
             while (rs.next()) {
                 // 5. mapping(parsing) (db result -> model)
-                OutPlayer outPlayer = new OutPlayer(
-                        rs.getInt("id"),
-                        rs.getInt("player_id"),
-                        rs.getString("reason"),
-                        rs.getTimestamp("created_at")
+                OutPlayerRespDTO outPlayer = new OutPlayerRespDTO(
+                        rs.getInt("p.id"),
+                        rs.getString("p.name"),
+                        rs.getString("p.position"),
+                        rs.getString("o.reason"),
+                        rs.getTimestamp("o.created_at")
                 );
 
                 // 5. collect
-                OutPlayerList.add(outPlayer);
+                outPlayerList.add(outPlayer);
             }
-            return OutPlayerList;
+            return outPlayerList;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -135,35 +138,26 @@ public class OutPlayerDao {
         return null;
     }
 
-    public void updateOutPlayerReason(int playerId, String reason) {
+    public OutPlayerRespDTO updateOutPlayerReason(int playerId, String reason) {
         String updateQuery = "update out_player_tb set reason = ? where player_id = ?";
-        String selectQuery = "select player_tb.name, out_player_tb.reason " +
-                "from out_player_tb " +
-                "join player_tb on out_player_tb.player_id = player_tb.id " +
-                "where out_player_tb.player_id = ?";
+
 
         try {
-            String beforeReason = null;
-            String playerName = null;
             PreparedStatement updatePstmt = connection.prepareStatement(updateQuery);
-            PreparedStatement selectPstmt = connection.prepareStatement(selectQuery);
 
             updatePstmt.setString(1, reason);
             updatePstmt.setInt(2, playerId);
-            selectPstmt.setInt(1, playerId);
 
-            ResultSet rs = selectPstmt.executeQuery();
-            if (rs.next()) {
-                playerName = rs.getString("name");
-                beforeReason = rs.getString("reason");
+            int i = updatePstmt.executeUpdate();
+            if (i == 1) {
+                return findByPlayerId(playerId);
             }
-
-            updatePstmt.executeUpdate();
-            System.out.println(playerName + " 선수 퇴출 이유 수정완료! " + beforeReason + " -> " + reason);
-        } catch (Exception e) {
-            System.out.println("수정 실패!= " + e.getMessage());
+            else return null;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            throw new StadiumException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-
     }
 
     public void deleteOutPlayer(int playerId) {

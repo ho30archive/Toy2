@@ -17,7 +17,7 @@ public class PlayerService {
     static final PlayerDao playerDao = PlayerDao.getInstance(connection);
     private static final PlayerService instance = new PlayerService();
 
-    CustomPrint customPrint = new CustomPrint();
+    private static final CustomPrint customPrint = CustomPrint.getInstance();
 
     private PlayerService() {
 
@@ -171,7 +171,7 @@ public class PlayerService {
         } catch (IllegalStateException e) {
             System.out.println("올바른 포지션을 입력해주세요.");
         } catch (NullPointerException e) {
-            System.out.println("선수 등록 실패!");
+            System.out.println("선수 수정 실패!");
         } catch (StadiumException e) {
             System.out.println("선수 수정 실패! 포지션이 중복되었습니다.");
         } catch (RuntimeException e) {
