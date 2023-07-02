@@ -1,23 +1,28 @@
 package toy.baseball.management.service;
 
 import toy.baseball.management.dao.PlayerDao;
+import toy.baseball.management.dao.TeamDao;
 import toy.baseball.management.db.DBConnection;
+import toy.baseball.management.dto.PositionRespDTO;
 import toy.baseball.management.enums.Positions;
 import toy.baseball.management.exception.StadiumException;
 import toy.baseball.management.model.Player;
 import toy.baseball.management.model.Stadium;
+import toy.baseball.management.model.Team;
 import toy.baseball.management.util.CustomPrint;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerService {
 
     static final Connection connection = DBConnection.getInstance();
     static final PlayerDao playerDao = PlayerDao.getInstance(connection);
+    static final TeamDao teamDao = TeamDao.getInstance(connection);
     private static final PlayerService instance = new PlayerService();
 
-    CustomPrint customPrint = new CustomPrint();
+    private static final CustomPrint customPrint = CustomPrint.getInstance();
 
     private PlayerService() {
 
@@ -171,7 +176,7 @@ public class PlayerService {
         } catch (IllegalStateException e) {
             System.out.println("올바른 포지션을 입력해주세요.");
         } catch (NullPointerException e) {
-            System.out.println("선수 등록 실패!");
+            System.out.println("선수 수정 실패!");
         } catch (StadiumException e) {
             System.out.println("선수 수정 실패! 포지션이 중복되었습니다.");
         } catch (RuntimeException e) {
@@ -179,6 +184,55 @@ public class PlayerService {
         }
 
     }
+
+
+    // TODO: 2023/07/02 ㅠㅠ 
+    public void getPositionsPlayerByTeamList() {
+        try {
+            List<PositionRespDTO> positionRespDTOList = playerDao.findAllPositionsPlayerByTeam();
+            List<Team> teamList = teamDao.findAllTeam();
+            if (positionRespDTOList.size() != 0 && teamList.size() != 0) {
+
+                System.out.println("포지션별 팀 야구 선수 페이지 조회 완료!");
+
+                // 상단
+                int t = 16;
+                System.out.print("|      position        ");
+                for (int i = 0; i < teamList.size(); i++) {
+                    String teamname = teamList.get(i).getName();
+                    System.out.print(teamname);
+                    for (int j = 0; j < t-teamname.length(); j++) {
+                        System.out.print(" ");
+                    }
+                }
+                System.out.println("|");
+
+                // 중단
+                Positions[] enums = Positions.values();
+                for (int i = 0; i < enums.length; i++) {
+                    System.out.print("|      " + enums[i]);
+
+                }
+
+
+
+                for (PositionRespDTO positionRespDTO : positionRespDTOList) {
+                    System.out.println(positionRespDTO);
+                }
+
+
+
+
+            } else {
+                System.out.println("조회된 정보가 없습니다.");
+            }
+        } catch (RuntimeException e) {
+            System.out.println("DB연결을 확인해주세요." + e.getMessage());
+        }
+
+
+    }
+
 
 
 }

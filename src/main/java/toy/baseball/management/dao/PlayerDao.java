@@ -1,6 +1,7 @@
 package toy.baseball.management.dao;
 
 import org.springframework.boot.jta.atomikos.AtomikosDataSourceBean;
+import toy.baseball.management.dto.PositionRespDTO;
 import toy.baseball.management.enums.Positions;
 import toy.baseball.management.exception.StadiumException;
 import toy.baseball.management.model.Player;
@@ -272,11 +273,28 @@ public class PlayerDao {
         }
     }
 
-    // TODO: 2023/06/29 퇴출쿼리짜야됨 
-    public void outPlayer() {
-        
+    public List<PositionRespDTO> findAllPositionsPlayerByTeam() {
+
+        List<PositionRespDTO> positionRespDTOList = new ArrayList<>();
+        String query = "select p.position, p.name, t.name from player_tb p join team_tb t on p.team_id = t.id";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                PositionRespDTO positionRespDTO = new PositionRespDTO(
+                        rs.getString("t.name"),
+                        rs.getString("p.name"),
+                        rs.getString("p.position")
+                );
+
+                positionRespDTOList.add(positionRespDTO);
+            }
+            return positionRespDTOList;
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
-
-
 
 }
