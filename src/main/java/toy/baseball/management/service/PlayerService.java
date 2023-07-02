@@ -147,5 +147,38 @@ public class PlayerService {
         }
     }
 
+    public void updatePlayerPosition(int playerId, String position) {
+        try {
+            Boolean isContained = false;
+            Positions[] enums = Positions.values();
+            for (Positions p : enums) {
+                if (p.getPositionName().equals(position)) {
+                    isContained = true;
+                    break;
+                }
+            }
+            if (isContained) {
+                Player player = playerDao.updatePlayerPosition(playerId, position);
+                if (player == null) {
+                    throw new RuntimeException();
+                }
+                System.out.println(position + " 으로 포지션 수정 완료!");
+                System.out.println("| ---- id ------------------------ teamId -------------------- name ---------------------- position ------------------ createdAt --------------- |");
+                customPrint.printPlayer(player);
+            } else throw new IllegalStateException();
+
+
+        } catch (IllegalStateException e) {
+            System.out.println("올바른 포지션을 입력해주세요.");
+        } catch (NullPointerException e) {
+            System.out.println("선수 등록 실패!");
+        } catch (StadiumException e) {
+            System.out.println("선수 수정 실패! 포지션이 중복되었습니다.");
+        } catch (RuntimeException e) {
+            System.out.println("선수 수정 실패! 아이디를 확인해주세요.");
+        }
+
+    }
+
 
 }
