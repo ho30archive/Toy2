@@ -113,4 +113,23 @@ public class PlayerService {
     }
 
 
+    public void updatePlayerName(int playerId, String name) {
+        try {
+            Player player = playerDao.updatePlayerName(playerId, name);
+            if (player == null) {
+                throw new RuntimeException();
+            } else {
+                System.out.println(name + "으로 이름 수정 완료!");
+                System.out.println("| ---- id ------------------------ teamId -------------------- name ---------------------- position ------------------ createdAt --------------- |");
+                customPrint.printPlayer(player);
+            }
+        } catch (StadiumException e) {
+            System.out.println("선수 수정 실패!");
+        } catch (RuntimeException e) {
+            System.out.println("선수 수정 실패! 아이디를 확인해주세요.");
+        }
+
+    }
+
+
 }
