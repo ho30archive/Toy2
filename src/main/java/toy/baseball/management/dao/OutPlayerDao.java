@@ -1,6 +1,9 @@
 package toy.baseball.management.dao;
 
+import toy.baseball.management.dto.OutPlayerRespDTO;
+import toy.baseball.management.exception.StadiumException;
 import toy.baseball.management.model.OutPlayer;
+import toy.baseball.management.model.Player;
 import toy.baseball.management.model.Stadium;
 
 import java.sql.*;
@@ -12,8 +15,17 @@ public class OutPlayerDao {
 
     private Connection connection;
 
+    private static OutPlayerDao instance;
+
     public OutPlayerDao(Connection connection) {
         this.connection = connection;
+    }
+
+    public static OutPlayerDao getInstance(Connection connection) {
+        if (instance == null) {
+            instance = new OutPlayerDao(connection);
+        }
+        return instance;
     }
 
     public List<OutPlayer> findAllOutPlayer() {
@@ -47,25 +59,80 @@ public class OutPlayerDao {
         }
     }
 
-    public void registerOutPlayer(int playerId, String reason) {
+    public OutPlayerRespDTO registerOutPlayer(int playerId, String reason) {
         LocalDateTime currentDateTime = LocalDateTime.now(); // Get the current date and time
 
         // 1. sql
-        String query = "insert into out_player_tb values (?, ?, ?, ?)";
+        String insertQuery = "insert into out_player_tb values (?, ?, ?, ?)";
+        String updateQuery = "update player_tb set team_id = null where id = ?";
 
         // 2. buffer
         try {
-            PreparedStatement statement = connection.prepareStatement(query);
+            connection.setAutoCommit(false); // 트랜젝션 시작
+
+            PreparedStatement statement = connection.prepareStatement(insertQuery);
+            PreparedStatement statement2 = connection.prepareStatement(updateQuery);
+
             statement.setInt(1, 0);
             statement.setInt(2, playerId);
             statement.setString(3, reason);
             statement.setTimestamp(4, Timestamp.valueOf(currentDateTime));
 
-            statement.executeUpdate();
-            System.out.println(playerId + "번 선수 퇴출. 사유 : " + reason + " 등록 완료!");
-        } catch (Exception e) {
-            System.out.println("등록 실패!= " + e.getMessage());
+            statement2.setInt(1, playerId);
+
+            int i = statement.executeUpdate();
+            int j = statement2.executeUpdate();
+            if (i == 1 && j == 1) {
+                connection.commit();
+                return findByPlayerId(playerId);
+            }
+            else return null;
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            throw new StadiumException();
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException exception) {
+                    throw new RuntimeException();
+                }
+            }
         }
+        return null;
+    }
+
+    public OutPlayerRespDTO findByPlayerId(int playerId) {
+        // 1. sql
+        String query = "select p.id, p.name, p.position, o.reason, o.created_at " +
+                "from out_player_tb o " +
+                "join player_tb p on o.player_id = p.id " +
+                "where o.player_id = ?";
+
+        // 2. buffer
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, playerId);
+
+            // 3. send
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                OutPlayerRespDTO outPlayer = new OutPlayerRespDTO(
+                        rs.getInt("p.id"),
+                        rs.getString("p.name"),
+                        rs.getString("p.position"),
+                        rs.getString("o.reason"),
+                        rs.getTimestamp("o.created_at")
+                );
+                return outPlayer;
+            }
+
+            // 4. mapping(parsing) (db result -> model)
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 
     public void updateOutPlayerReason(int playerId, String reason) {

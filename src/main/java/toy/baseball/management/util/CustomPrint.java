@@ -1,5 +1,6 @@
 package toy.baseball.management.util;
 
+import toy.baseball.management.dto.OutPlayerRespDTO;
 import toy.baseball.management.dto.TeamRespDTO;
 import toy.baseball.management.model.Player;
 import toy.baseball.management.model.Stadium;
@@ -14,6 +15,22 @@ public class CustomPrint {
             instance = new CustomPrint();
         }
         return instance;
+    }
+
+    public void printOutPlayer(OutPlayerRespDTO outPlayerRespDTO) {
+        String pId = String.valueOf(outPlayerRespDTO.getPlayerId());
+        String pName = outPlayerRespDTO.getPlayerName();
+        String pPosition = outPlayerRespDTO.getPlayerPosition();
+        String oReason = outPlayerRespDTO.getOutPlayerReason();
+        String createdAt = String.valueOf(outPlayerRespDTO.getOutPlayercreatedAt());
+        System.out.print("|");
+        printStr(pId);
+        printStr(pName);
+        printStr(pPosition);
+        printStr(oReason);
+        printStr(createdAt);
+        System.out.println("     |");
+        System.out.println("| ---------------------------------------------------------------------------------------------------------------------------------------------- |");
     }
 
     public void printPlayer(Player player) {
