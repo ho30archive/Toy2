@@ -128,7 +128,23 @@ public class PlayerService {
         } catch (RuntimeException e) {
             System.out.println("선수 수정 실패! 아이디를 확인해주세요.");
         }
+    }
 
+    public void updatePlayerTeamId(int playerId, int teamId) {
+        try {
+            Player player = playerDao.updatePlayerTeamId(playerId, teamId);
+            if (player == null) {
+                throw new RuntimeException();
+            } else {
+                System.out.println(teamId + "번으로 팀 번호 수정 완료!");
+                System.out.println("| ---- id ------------------------ teamId -------------------- name ---------------------- position ------------------ createdAt --------------- |");
+                customPrint.printPlayer(player);
+            }
+        } catch (StadiumException e) {
+            System.out.println("선수 수정 실패! 팀 번호나 포지션 중복여부를 확인해주세요.");
+        } catch (RuntimeException e) {
+            System.out.println("선수 수정 실패! 아이디를 확인해주세요.");
+        }
     }
 
 
