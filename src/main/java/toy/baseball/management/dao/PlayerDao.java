@@ -5,6 +5,7 @@ import toy.baseball.management.enums.Positions;
 import toy.baseball.management.exception.StadiumException;
 import toy.baseball.management.model.Player;
 import toy.baseball.management.model.Stadium;
+import toy.baseball.management.model.Team;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -175,29 +176,56 @@ public class PlayerDao {
         }
     }
 
-    public void updatePlayerName(int id, String name) {
+    public Player updatePlayerName(int id, String name) {
         String updateQuery = "update player_tb set name = ? where id = ?";
-        String selectQuery = "select (name) from player_tb where id = ?";
 
         try {
-            String beforeName = null;
             PreparedStatement updatePstmt = connection.prepareStatement(updateQuery);
-            PreparedStatement selectPstmt = connection.prepareStatement(selectQuery);
 
             updatePstmt.setString(1, name);
             updatePstmt.setInt(2, id);
-            selectPstmt.setInt(1, id);
 
-            ResultSet rs = selectPstmt.executeQuery();
+
+            int i = updatePstmt.executeUpdate();
+            if (i == 1) {
+                return findById(id);
+            }
+            else return null;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            throw new StadiumException();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Player findById(int playerId) {
+        // 1. sql
+        String query = "select * from player_tb where id = ?";
+
+        // 2. buffer
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, playerId);
+
+            // 3. send
+            ResultSet rs = statement.executeQuery();
             if (rs.next()) {
-                beforeName = rs.getString("name");
+                Player player = new Player(
+                        rs.getInt("id"),
+                        rs.getInt("team_id"),
+                        rs.getString("name"),
+                        rs.getString("position"),
+                        rs.getTimestamp("created_at")
+                );
+                return player;
             }
 
-            updatePstmt.executeUpdate();
-            System.out.println("플레이어 이름 수정완료! " + beforeName + " -> " + name);
-        } catch (Exception e) {
-            System.out.println("수정 실패!= " + e.getMessage());
+            // 4. mapping(parsing) (db result -> model)
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
+        return null;
     }
 
     public void updatePlayerTeamId(int playerId, int teamId) {
